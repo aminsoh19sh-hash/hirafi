@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0E9F92">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <title>Hirafi</title>
+  <style>
+    /* Top menu: always fits the screen width, shrinks instead of overflowing */
+    .menu {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      gap: 4px !important;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden !important;
+      box-sizing: border-box
+    }
+
+    .menu button {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      padding: 8px 4px !important;
+      font-size: clamp(.62rem, 2.8vw, .9rem) !important;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .menu button.logout {
+      flex: 0 1 auto !important;
+      padding-inline: 8px !important
+    }
+  </style>
+</head>
+
+<body data-title="find">
+  <div id="hd"></div>
+  <main class="wrap" id="v"></main>
+  <dialog id="dl">
+    <h3 data-i="edit"></h3><label data-i="name"></label><input id="e1"><label data-i="phone"></label><input
+      id="e2"><label data-i="addr"></label><input id="e3"><label data-i="date"></label><input id="e4"
+      type="datetime-local"><label data-i="note"></label><textarea id="e5" rows="2"></textarea>
+    <div class="msg" id="em"></div>
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn t" id="es" data-i="save"
+        style="flex:1"></button><button class="btn g" id="ec" data-i="cancel"></button></div>
+  </dialog>
+  <dialog id="pd">
+    <h3 data-i="edit"></h3><label data-i="name"></label><input id="p1" autocomplete="name"><label
+      data-i="phone"></label><input id="p2" type="tel"><label data-i="addr"></label><input id="p3">
+    <div class="msg" id="pm"></div>
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn t" id="ps" data-i="save"
+        style="flex:1"></button><button class="btn g" id="pc" data-i="cancel"></button></div>
+  </dialog>
+  <div id="ft"></div>
+  <script src="/js/app.js"></script>
+  <script>
+    const C = (u, m, b) => api(u, { method: m, body: b, tk: 'cus' }), v = id => document.getElementById(id).value.trim();
+    let view = 'auto', pick = null, fresh = false, cq = '', EID = null, APS = [], TRADE = '';
+    const okCard = a => { const [d, tm] = dt(a.date); return `<div class="card req okc"><b>✅ ${t('conf_msg')}</b><div class="rg"><span>🛠️ ${t('chosen')}: <b title="${esc(a.craftsmanName)}">${esc(shortName(a.craftsmanName))}</b></span><span>📞 <a href="tel:${esc(a.craftsmanPhone || '')}"><b>${esc(a.craftsmanPhone || '')}</b></a></span><span>📅 ${esc(d)} · 🕒 ${esc(tm)}</span></div><a class="btn ok s" href="tel:${esc(a.craftsmanPhone || '')}">📞 ${t('call_drv')}</a></div>` };
+    const IC = { pending: '⏳', confirmed: '✅', rejected: '⛔' };
+    const logout = () => { delete sessionStorage.cus; view = 'auto'; fresh = false; render() };
+    Object.assign(T.ar, { reqs: 'الطلبات', same_craft: 'نفس الحرفي', same_cust: 'نفس الزبون', upcoming: 'القادمة', past: 'السابقة' });
+    Object.assign(T.fr, { reqs: 'Demandes', same_craft: 'Même artisan', same_cust: 'Même client', upcoming: 'À venir', past: 'Passés' });
+    Object.assign(T.en, { reqs: 'Requests', same_craft: 'Same craftsman', same_cust: 'Same customer', upcoming: 'Upcoming', past: 'Past' });
+    let ot = 'req';
+    const grp = (arr, key) => { const m = new Map(); arr.forEach(a => { const k = key(a); m.has(k) ? m.get(k).push(a) : m.set(k, [a]) }); return [...m.values()] };
+    const when = a => esc(a.date.replace('T', ' '));
+    const item = a => `<div class="rowi s-${a.status}"><div style="min-width:0"><b>📅 ${when(a)}</b><small>📍 ${esc(a.address)}${a.note ? ' · 📝 ' + esc(a.note) : ''}</small></div><span class="badge b-${a.status}">${t('st_' + a.status)}</span><div class="act"><button class="btn s t" data-e="${a.id}">${t('edit')}</button><button class="btn s r" data-x="${a.id}">${t('del')}</button></div></div>`;
+    const gcard = g => { const f = g[0], n = g.length; return `<details class="fold grp"><summary><div class="av">${esc((f.craftsmanName || 'H')[0])}</div><div class="m"><b title="${esc(f.craftsmanName)}">${esc(shortName(f.craftsmanName))}</b><small>${n > 1 ? `<span class="chip">🔁 ${t('same_craft')} · ${n}</span>` : `📅 ${when(f)}`}</small></div>${n === 1 ? `<span class="badge b-${f.status}">${t('st_' + f.status)}</span>` : ''}</summary><div class="in">${g.map(item).join('')}${f.status === 'confirmed' && f.craftsmanPhone ? `<a class="btn ok s" style="width:100%;margin-top:10px" href="tel:${esc(f.craftsmanPhone)}">📞 ${t('call_drv')}</a>` : ''}</div></details>` };
+
+
+    /* Trade cards view */
+    const tradeCards = () => {
+      const counts = {};
+      (window._ALL_CRAFTS || []).forEach(c => { counts[c.trade] = (counts[c.trade] || 0) + 1 });
+      return Object.keys(counts).map(k => `<div class="trade-card" data-trade="${k}"><div class="tic">${ticon(k)}</div><div class="tname">${t('v_' + k) || k}</div><div class="tcount">${counts[k]} ${t('craftsmen')}</div></div>`).join('');
+    };
+
+    async function render() {
+      const el = $('#v');
+      if (!sessionStorage.cus) return authView(el, 'cus', '/api/customer', n => { view = n ? 'profile' : 'trades'; render() }, t('find'));
+      try { APS = await C('/api/customer/appointments') } catch (e) { delete sessionStorage.cus; return render() }
+      if (view === 'auto') view = 'trades';
+      const lo = `<div class="menu">
+    <button data-v="trades" class="${view === 'trades' || view === 'list' || view === 'form' ? 'on' : ''}">🛠️ ${t('find')}</button>
+    <button data-v="orders" class="${view === 'orders' ? 'on' : ''}">📋 ${t('mine')}</button>
+    <button data-v="profile" class="${view === 'profile' ? 'on' : ''}">👤 ${t('myinfo')}</button>
+    <button id="lo" class="logout">${t('logout')}</button>
+  </div>`;
+
+      if (view === 'trades') {
+        const L = await api('/api/public/craftsmen?city=' + encodeURIComponent(cq));
+        window._ALL_CRAFTS = L;
+        const cOpts = `<option value="">🌍 ${t('all_cities')}</option>` + CITIES.map(c => `<option value="${c}"${cq === c ? ' selected' : ''}>${c}</option>`).join('');
+        const tOpts = `<option value="">🛠️ ${t('all_trades')}</option>` + TRADES.map(k => `<option value="${k}"${TRADE === k ? ' selected' : ''}>${ticon(k)} ${t('v_' + k)}</option>`).join('');
+        const filtered = L.filter(d => (!cq || d.city === cq) && (!TRADE || d.trade === TRADE));
+        const hasFilter = cq.trim() || TRADE;
+
+        if (hasFilter) {
+          el.innerHTML = `<div style="padding:16px 0">${lo}
+      <div class="filters">
+        <select id="q" class="city-select">${cOpts}</select>
+        <select id="tr" class="city-select">${tOpts}</select>
+        <button class="btn t" id="sr">${t('search')}</button>
+        <button class="btn g" id="clr">${t('all')}</button>
+      </div>
+      <h3 style="margin:10px 0 16px;font-size:1.05rem">
+        ${cq ? `📍 ${esc(cq)}` : ''}
+        ${cq && TRADE ? ' · ' : ''}
+        ${TRADE ? `${ticon(TRADE)} ${esc(t('v_' + TRADE))}` : ''}
+        — ${filtered.length} ${t('craftsmen')}
+      </h3>
+      <div class="craft-grid">${filtered.map(d => `<div class="craft-card"><div class="top"><div class="av">${esc(d.fullName[0])}</div><div class="meta"><b title="${esc(d.fullName)}">${esc(shortName(d.fullName))}</b><small>📍 ${esc(d.city)}</small></div></div><div class="trade">⭐ ${d.rating} · ${ticon(d.trade)} ${esc(tname(d.trade))}</div><button class="btn t s" data-d="${d.id}">${t('choose')}</button></div>`).join('') || `<p style="text-align:center;color:var(--mut);padding:24px 0">${t('none')}</p>`}</div></div>`;
+        } else {
+          el.innerHTML = `<div style="padding:16px 0">${lo}
+      <div class="filters">
+        <select id="q" class="city-select">${cOpts}</select>
+        <select id="tr" class="city-select">${tOpts}</select>
+        <button class="btn t" id="sr">${t('search')}</button>
+      </div>
+      <div class="cards">${tradeCards() || `<p>${t('none')}</p>`}</div></div>`;
+        }
+        $('#sr').onclick = () => { cq = $('#q').value; TRADE = $('#tr').value; render() };
+        if ($('#clr')) $('#clr').onclick = () => { cq = ''; TRADE = ''; render() };
+        el.querySelectorAll('[data-trade]').forEach(b => b.onclick = () => { TRADE = b.dataset.trade; view = 'list'; render() });
+        el.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { pick = filtered.find(d => d.id === b.dataset.d) || L.find(d => d.id === b.dataset.d); view = 'form'; render() });
+      }
+      else if (view === 'list') {
+        const L = (window._ALL_CRAFTS || []).filter(c => c.trade === TRADE);
+        el.innerHTML = `<div style="padding:16px 0">${lo}
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><button class="btn g s" id="bk">← ${t('back')}</button><h2 style="font-size:1.3rem;margin:0">${ticon(TRADE)} ${t('v_' + TRADE) || TRADE}</h2></div>
+    <div class="craft-grid">${L.map(d => `<div class="craft-card"><div class="top"><div class="av">${esc(d.fullName[0])}</div><div class="meta"><b title="${esc(d.fullName)}">${esc(shortName(d.fullName))}</b><small>📍 ${esc(d.city)}</small></div></div><div class="trade">⭐ ${d.rating}</div><button class="btn t s" data-d="${d.id}">${t('choose')}</button></div>`).join('') || `<p style="text-align:center;color:var(--mut);padding:24px 0">${t('none')}</p>`}</div></div>`;
+        $('#bk').onclick = () => { TRADE = ''; view = 'trades'; render() };
+        el.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { pick = L.find(d => d.id === b.dataset.d); view = 'form'; render() });
+      }
+      else if (view === 'form') {
+        el.innerHTML = `<div class="panel" style="max-width:640px">${lo}
+    <div class="card drv" style="margin:0 0 12px"><div class="av">${esc(pick.fullName[0])}</div><div style="min-width:0"><small>${t('chosen')}</small><br><b title="${esc(pick.fullName)}">${esc(shortName(pick.fullName))}</b> · 📍 ${esc(pick.city)}</div></div>
+    <label>${t('name')}</label><input id="fn"><label>${t('phone')}</label><input id="ph" type="tel">
+    <label>${t('city')}</label><select class="f" id="ct"></select><input id="ctc" style="display:none;margin-top:8px">
+    <label>${t('addr')}</label><input id="ad">
+    <label>${t('date')}</label><input id="dt" type="datetime-local"><label>${t('note')}</label><textarea id="nt" rows="2"></textarea>
+    <details class="fold" style="margin-top:16px;box-shadow:none"><summary>📄 ${t('terms_t')}</summary><div class="in terms" style="max-height:none;margin:0">${t('terms_c')}</div></details>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" id="ag">${t('agree')}</label><div class="msg" id="m2"></div>
+    <div style="display:flex;gap:8px"><button class="btn t" id="sd" style="flex:1">${t('send')}</button><button class="btn g" id="bk">${t('back')}</button></div></div>`;
+        $('#ct').innerHTML = cityOpts('');
+        $('#ctc').placeholder = t('custom_city');
+        bindCustom($('#ct'), $('#ctc'));
+        $('#bk').onclick = () => { view = 'list'; render() };
+        $('#sd').onclick = async () => {
+          if (!$('#ag').checked) return $('#m2').textContent = t('mustagree');
+          const city = finalVal($('#ct'), $('#ctc'));
+          if (!city) return $('#m2').textContent = t('err');
+          try {
+            await C('/api/customer/appointments', 'POST', {
+              craftsmanId: pick.id,
+              customerName: v('fn'),
+              phone: v('ph'),
+              address: city + (v('ad') ? ' — ' + v('ad') : ''),
+              date: v('dt'),
+              note: v('nt')
+            });
+            fresh = true; ot = 'req'; view = 'orders'; render();
+          } catch (e) { $('#m2').textContent = t('err') }
+        };
+      }
+      else if (view === 'orders') {
+        const reqs = APS.filter(a => a.status !== 'confirmed'), apts = APS.filter(a => a.status === 'confirmed');
+        const crafts = new Set(APS.map(a => a.craftsmanId)).size;
+        const groups = grp((ot === 'req' ? reqs : apts).slice().sort((a, b) => b.date.localeCompare(a.date)), a => a.craftsmanId);
+        el.innerHTML = `<div style="max-width:960px;margin:auto;padding:16px 0">${lo}
+    ${fresh ? `<div class="card thanks"><div class="big">🎉</div><h2>${t('thanks_t')}</h2><p>${t('thanks_c')}</p></div>` : ''}
+    <div class="kpis"><div class="kpi"><div class="ic">📨</div><b>${APS.length}</b><span>${t('reqs')}</span></div><div class="kpi sun"><div class="ic">📅</div><b>${apts.length}</b><span>${t('appts')}</span></div><div class="kpi ink"><div class="ic">🛠️</div><b>${crafts}</b><span>${t('craftsmen')}</span></div></div>
+    <div class="seg"><button data-o="req" class="${ot === 'req' ? 'on' : ''}">📨 ${t('reqs')}<i>${reqs.length}</i></button><button data-o="apt" class="${ot === 'apt' ? 'on' : ''}">📅 ${t('appts')}<i>${apts.length}</i></button></div>
+    <div class="sec"><button class="btn t s" id="nb">＋ ${t('newbk')}</button></div>
+    ${groups.map(gcard).join('') || `<div class="empty"><div class="big">${ot === 'req' ? '📭' : '🗓️'}</div>${t('none')}</div>`}</div>`;
+        el.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ot = b.dataset.o; fresh = false; render() });
+        $('#nb').onclick = () => { fresh = false; view = 'trades'; render() };
+        el.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { const x = APS.find(a => a.id === b.dataset.e); EID = x.id;[x.customerName, x.phone, x.address, x.date, x.note].forEach((s, i) => $('#e' + (i + 1)).value = s || ''); $('#em').textContent = ''; $('#dl').showModal() });
+        el.querySelectorAll('[data-x]').forEach(b => b.onclick = async () => { if (!confirm(t('sure'))) return; await C('/api/customer/appointments/' + b.dataset.x, 'DELETE'); view = 'orders'; render() });
+      }
+      else if (view === 'profile') {
+        let me = {};
+        try { me = await C('/api/customer/me') } catch (e) { }
+        const initial = (me.email || 'U')[0].toUpperCase();
+        const last = APS.slice().sort((a, b) => b.date.localeCompare(a.date))[0] || {};
+        const info = {
+          name: me.fullName || me.name || last.customerName || '—',
+          phone: me.phone || last.phone || '—',
+          addr: me.address || last.address || '—'
+        };
+        el.innerHTML = `<div style="max-width:760px;margin:auto;padding:16px 0">${lo}
+    <div class="profile-card"><div class="profile-head"><div class="av">${initial}</div><div style="min-width:0"><h3>${t('myinfo')}</h3><small>${esc(me.email || '')}</small></div></div>
+    <div class="tiles"><div><b>${APS.length}</b>${t('requests')}</div><div><b>${APS.filter(a => a.status === 'confirmed').length}</b>${t('st_confirmed')}</div><div><b>${APS.filter(a => a.status === 'pending').length}</b>${t('st_pending')}</div></div>
+    <details class="fold" style="box-shadow:none;margin-top:14px"><summary>ℹ️ ${t('myinfo')}</summary><div class="in profile-info">
+      <div><b>${t('name')}:</b> ${esc(info.name)}</div>
+      <div><b>${t('email')}:</b> ${esc(me.email || '—')}</div>
+      <div><b>${t('phone')}:</b> ${esc(info.phone)}</div>
+      <div><b>${t('addr')}:</b> ${esc(info.addr)}</div>
+    </div></details>
+    <div class="profile-actions"><button class="btn t" id="ed" style="flex:1">${t('edit')}</button><button class="btn r" id="dx">${t('del')}</button></div>
+    <details class="fold" style="box-shadow:none;margin-top:14px"><summary>🔒 GDPR</summary><div class="in" style="color:var(--mut);font-size:.88rem">${t('gdpr_note')}</div></details></div></div>`;
+        $('#ed').onclick = () => {
+          $('#p1').value = me.fullName || last.customerName || '';
+          $('#p2').value = me.phone || last.phone || '';
+          $('#p3').value = me.address || '';
+          $('#pm').textContent = '';
+          $('#pd').showModal();
+        };
+        $('#pc').onclick = () => $('#pd').close();
+        $('#ps').onclick = async () => {
+          const x = { fullName: $('#p1').value.trim(), phone: $('#p2').value.trim(), address: $('#p3').value.trim() };
+          if (!x.fullName || x.phone.length < 8) return $('#pm').textContent = t('err');
+          try { await C('/api/customer/me', 'PUT', x); $('#pd').close(); toast(t('saved')); render() }
+          catch (e) { $('#pm').textContent = t('err') }
+        };
+        $('#dx').onclick = async () => { if (!confirm(t('sure'))) return; try { await C('/api/customer/appointments') } catch (e) { }; delete sessionStorage.cus; view = 'auto'; render() };
+      }
+      $('#lo').onclick = logout;
+      el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view = b.dataset.v; fresh = false; render() });
+    }
+    $('#ec').onclick = () => $('#dl').close();
+    $('#es').onclick = async () => { try { await C('/api/customer/appointments/' + EID, 'PUT', { customerName: $('#e1').value, phone: $('#e2').value, address: $('#e3').value, date: $('#e4').value, note: $('#e5').value }); $('#dl').close(); fresh = false; toast(t('saved')); view = 'orders'; render() } catch (e) { $('#em').textContent = t('err') } };
+    window.onLang = render;
+    setInterval(() => { if (view === 'orders' && sessionStorage.cus && !$('#dl').open && !document.hidden && !$('#v details[open]')) render() }, 20000);
+  </script>
+</body>
+
+</html>

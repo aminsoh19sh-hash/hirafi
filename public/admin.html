@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0E9F92">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <title>Hirafi</title>
+  <style>
+    /* Activity feed */
+    .act-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 18px 0 10px
+    }
+
+    .act-head h3 {
+      margin: 0;
+      font-size: 1.05rem
+    }
+
+    .evl {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .evd {
+      font-size: .8rem;
+      color: var(--mut);
+      margin: 14px 0 4px;
+      font-weight: 700
+    }
+
+    .eve {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(128, 128, 128, .07);
+      border-inline-start: 4px solid var(--c, #0E9F92)
+    }
+
+    .eve .i {
+      font-size: 1.35rem;
+      line-height: 1.2
+    }
+
+    .eve .b {
+      min-width: 0;
+      flex: 1
+    }
+
+    .eve .b>b {
+      display: block
+    }
+
+    .eve .b small {
+      display: block;
+      color: var(--mut);
+      line-height: 1.8
+    }
+
+    .eve .tm {
+      font-size: .75rem;
+      color: var(--mut);
+      white-space: nowrap;
+      text-align: end
+    }
+
+    .eve .tm span {
+      display: block
+    }
+  </style>
+</head>
+
+<body data-title="admin">
+  <div id="hd"></div>
+  <main class="wrap" style="padding-bottom:40px">
+    <div class="panel" id="lg1">
+      <h2 data-i="admin"></h2><label data-i="email"></label><input id="ae" type="email"><label
+        data-i="pass"></label><input id="ap" type="password">
+      <div class="msg" id="am"></div><button class="btn t" id="al" style="width:100%" data-i="login"></button>
+    </div>
+    <div id="app" hidden>
+      <div class="tabs" id="tb"><button data-t="d" class="on" data-i="dash"></button><button data-t="r"
+          data-i="craftsmen"></button><button data-t="a" data-i="appts"></button><button data-t="c"
+          data-i="customers"></button><button id="lo" data-i="logout" style="margin-inline-start:auto"></button></div>
+
+      <div id="d">
+        <div class="kpis" id="kp"></div>
+        <div class="mini" id="st"></div>
+
+        <div class="two" style="margin-top:16px">
+          <details class="fold">
+            <summary>📍 <span data-i="byc"></span></summary>
+            <div class="in" id="bc"></div>
+          </details>
+          <details class="fold">
+            <summary>🕘 <span data-i="latest"></span></summary>
+            <div class="in">
+              <div class="pills" id="ef"></div>
+              <div class="evl" id="ev"></div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div id="r" hidden>
+        <div class="filters"><input id="fq" data-ph="search"><button class="btn g" id="ex" data-i="export"></button>
+        </div>
+        <div class="seg n4" id="rs"></div>
+        <div class="glist" id="tr"></div>
+      </div>
+
+      <div id="a" hidden>
+        <div class="seg" id="as"></div>
+        <div class="pills" id="ag"></div>
+        <div class="glist" id="ta"></div>
+      </div>
+
+      <div id="c" hidden>
+        <div class="glist" id="tc"></div>
+      </div>
+    </div>
+  </main>
+  <dialog id="dl">
+    <h3 data-i="edit"></h3><label data-i="name"></label><input id="e1"><label data-i="phone"></label><input
+      id="e2"><label data-i="city"></label><input id="e3"><label data-i="addr"></label><input id="e4">
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn t" id="es" data-i="save"
+        style="flex:1"></button><button class="btn g" id="ec" data-i="cancel"></button></div>
+  </dialog>
+  <div id="ft"></div>
+  <script src="/js/app.js"></script>
+  <script>
+    let D = [], A = [], CU = [], EVS = [], eid = null, rs = '', as = 'req', ag = 'cus', evf = 'all';
+    Object.assign(T.ar, {
+      reqs: 'الطلبات', same_craft: 'نفس الحرفي', same_cust: 'نفس الزبون', accounts: 'حسابات', by_cus: 'حسب الزبون', by_cra: 'حسب الحرفي',
+      latest: 'آخر الأحداث', ev_f_all: 'الكل', ev_f_appt: 'المواعيد', ev_f_cra: 'الحرفيون', ev_f_cus: 'الزبائن',
+      ev_booking: 'طلب موعد جديد', ev_appt_confirmed: 'تم تأكيد الموعد', ev_appt_rejected: 'تم رفض الطلب', ev_appt_pending: 'أُعيد الطلب إلى الانتظار',
+      ev_appt_edited: 'الزبون عدّل طلبه', ev_appt_cancelled: 'الزبون ألغى طلبه', ev_appt_deleted: 'تم حذف الطلب',
+      ev_register: 'حرفي جديد أكمل تسجيله', ev_cra_signup: 'حساب حرفي جديد', ev_cus_signup: 'حساب زبون جديد', ev_signup: 'حساب جديد',
+      ev_accepted: 'تم قبول حرفي', ev_rejected: 'تم رفض حرفي', ev_pending: 'حرفي قيد المراجعة', ev_delete: 'تم حذف حرفي'
+    });
+    Object.assign(T.fr, {
+      reqs: 'Demandes', same_craft: 'Même artisan', same_cust: 'Même client', accounts: 'comptes', by_cus: 'Par client', by_cra: 'Par artisan',
+      latest: 'Derniers événements', ev_f_all: 'Tout', ev_f_appt: 'Rendez-vous', ev_f_cra: 'Artisans', ev_f_cus: 'Clients',
+      ev_booking: 'Nouvelle demande de rendez-vous', ev_appt_confirmed: 'Rendez-vous confirmé', ev_appt_rejected: 'Demande refusée', ev_appt_pending: 'Demande remise en attente',
+      ev_appt_edited: 'Le client a modifié sa demande', ev_appt_cancelled: 'Le client a annulé sa demande', ev_appt_deleted: 'Demande supprimée',
+      ev_register: 'Nouvel artisan inscrit', ev_cra_signup: 'Nouveau compte artisan', ev_cus_signup: 'Nouveau compte client', ev_signup: 'Nouveau compte',
+      ev_accepted: 'Artisan accepté', ev_rejected: 'Artisan refusé', ev_pending: 'Artisan en attente', ev_delete: 'Artisan supprimé'
+    });
+    Object.assign(T.en, {
+      reqs: 'Requests', same_craft: 'Same craftsman', same_cust: 'Same customer', accounts: 'accounts', by_cus: 'By customer', by_cra: 'By craftsman',
+      latest: 'Latest activity', ev_f_all: 'All', ev_f_appt: 'Appointments', ev_f_cra: 'Craftsmen', ev_f_cus: 'Customers',
+      ev_booking: 'New appointment request', ev_appt_confirmed: 'Appointment confirmed', ev_appt_rejected: 'Request rejected', ev_appt_pending: 'Request set back to pending',
+      ev_appt_edited: 'Customer edited a request', ev_appt_cancelled: 'Customer cancelled a request', ev_appt_deleted: 'Request deleted',
+      ev_register: 'New craftsman completed registration', ev_cra_signup: 'New craftsman account', ev_cus_signup: 'New customer account', ev_signup: 'New account',
+      ev_accepted: 'Craftsman accepted', ev_rejected: 'Craftsman rejected', ev_pending: 'Craftsman under review', ev_delete: 'Craftsman deleted'
+    });
+
+    /* helpers */
+    const bd = s => `<span class="badge b-${s}">${t('st_' + s)}</span>`;
+    const pk = p => String(p || '').replace(/\D/g, '');
+    const grp = (arr, key) => { const m = new Map(); arr.forEach(a => { const k = key(a); m.has(k) ? m.get(k).push(a) : m.set(k, [a]) }); return [...m.values()] };
+    const sc = s => s === 'accepted' ? 'confirmed' : s;
+    const tn = k => TIC[k] ? tname(k) : (k || '—');
+    const when = a => esc(String(a.date).replace('T', ' '));
+    const desc = (arr, k) => arr.slice().sort((a, b) => String(b[k] || '').localeCompare(String(a[k] || '')));
+    const empty = i => `<div class="empty"><div class="big">${i || '🗂️'}</div>${t('none')}</div>`;
+    const segHtml = (items, cur) => items.map(([k, l, n]) => `<button data-k="${k}" class="${cur === k ? 'on' : ''}">${l}<i>${n}</i></button>`).join('');
+    const bindSeg = (id, fn) => $('#' + id).querySelectorAll('button').forEach(b => b.onclick = () => fn(b.dataset.k));
+    const chip = (k, n, u) => `<span class="chip">🔁 ${t(k)} · ${n}${u ? ' ' + t(u) : ''}</span>`;
+
+    /* activity feed: type → [icon, title key, group, color] */
+    const EVT = {
+      booking: ['📅', 'ev_booking', 'appt', '#F59E0B'],
+      appt_confirmed: ['✅', 'ev_appt_confirmed', 'appt', '#16A34A'],
+      confirmed: ['✅', 'ev_appt_confirmed', 'appt', '#16A34A'],
+      appt_rejected: ['⛔', 'ev_appt_rejected', 'appt', '#DC2626'],
+      appt_pending: ['⏳', 'ev_appt_pending', 'appt', '#F59E0B'],
+      appt_edited: ['✏️', 'ev_appt_edited', 'appt', '#F59E0B'],
+      appt_cancelled: ['🚫', 'ev_appt_cancelled', 'appt', '#DC2626'],
+      appt_deleted: ['🗑️', 'ev_appt_deleted', 'appt', '#6B7280'],
+      register: ['🆕', 'ev_register', 'cra', '#0E9F92'],
+      cra_signup: ['🔑', 'ev_cra_signup', 'cra', '#0E9F92'],
+      accepted: ['✅', 'ev_accepted', 'cra', '#16A34A'],
+      rejected: ['⛔', 'ev_rejected', 'cra', '#DC2626'],
+      pending: ['⏳', 'ev_pending', 'cra', '#F59E0B'],
+      delete: ['🗑️', 'ev_delete', 'cra', '#6B7280'],
+      cus_signup: ['👤', 'ev_cus_signup', 'cus', '#6366F1'],
+      signup: ['🔑', 'ev_signup', 'cus', '#6366F1']
+    };
+    const ago = at => {
+      try {
+        const s = Math.round((new Date(at) - Date.now()) / 1000), a = Math.abs(s), f = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+        for (const [u, n] of [['day', 86400], ['hour', 3600], ['minute', 60]]) if (a >= n) return f.format(Math.trunc(s / n), u);
+        return f.format(0, 'second');
+      } catch (_) { return '' }
+    };
+    const evDetail = (e, g) => {
+      if (g === 'appt') { const p = String(e.text || '').split(' → '); return `<small>👤 ${t('customer')}: <b>${esc(p[0])}</b>${p[1] ? `<br>🛠️ ${t('chosen')}: <b>${esc(p[1])}</b>` : ''}</small>` }
+      return `<small>${esc(e.text)}</small>`;
+    };
+    const evrows = () => {
+      $('#ef').innerHTML = [['all', t('ev_f_all')], ['appt', '📅 ' + t('ev_f_appt')], ['cra', '🛠️ ' + t('ev_f_cra')], ['cus', '👤 ' + t('ev_f_cus')]]
+        .map(([k, l]) => `<button data-k="${k}" class="${evf === k ? 'on' : ''}">${l}</button>`).join('');
+      bindSeg('ef', k => { evf = k; evrows() });
+      const L = EVS.filter(e => evf === 'all' || (EVT[e.type] || [])[2] === evf);
+      let day = '';
+      $('#ev').innerHTML = L.map(e => {
+        const m = EVT[e.type] || ['•', null, '', '#6B7280'], dd = new Date(e.at), d = dd.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long' });
+        const head = d !== day ? `<div class="evd">${esc(d)}</div>` : ''; day = d;
+        return `${head}<div class="eve" style="--c:${m[3]}"><div class="i">${m[0]}</div><div class="b"><b>${m[1] ? t(m[1]) : esc(e.type)}</b>${evDetail(e, m[2])}</div><div class="tm"><span>${dd.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}</span><span>${esc(ago(e.at))}</span></div></div>`;
+      }).join('') || empty('🕘');
+    };
+
+    const start = async () => { $('#lg1').hidden = true; $('#app').hidden = false; await refresh() };
+    const refresh = async () => {
+      try { const [s, d, a, c] = await Promise.all([api('/api/admin/stats'), api('/api/admin/craftsmen'), api('/api/admin/appointments'), api('/api/admin/customers')]); D = d; A = a; CU = c; EVS = s.events || []; stats(s); evrows(); rows(); arows(); crows() }
+      catch (e) { if (e.status === 401) { delete sessionStorage.adm; location.reload() } }
+    };
+
+    /* dashboard: 3 KPI cards + compact chips */
+    const stats = s => {
+      const S = s.status, reqs = A.filter(a => a.status !== 'confirmed').length, apts = A.filter(a => a.status === 'confirmed').length;
+      $('#kp').innerHTML = `<div class="kpi"><div class="ic">🛠️</div><b>${s.total}</b><span>${t('craftsmen')}</span></div><div class="kpi sun"><div class="ic">📨</div><b>${reqs}</b><span>${t('reqs')}</span></div><div class="kpi ink"><div class="ic">📅</div><b>${apts}</b><span>${t('appts')}</span></div>`;
+      const m = (i, n, l) => `<div>${i}<b>${n}</b><span>${t(l)}</span></div>`;
+      $('#st').innerHTML = m('⏳', S.pending || 0, 'pending') + m('✅', S.accepted || 0, 'accepted') + m('⛔', S.rejected || 0, 'rejected') + m('🆕', s.newWeek, 'week') + m('👥', new Set(CU.map(c => pk(c.phone) || c.email)).size, 'customers');
+      const mx = Math.max(1, ...Object.values(s.cities)); $('#bc').innerHTML = Object.entries(s.cities).map(([k, n]) => `<div class="brow"><span style="width:90px">${esc(k)}</span><i style="width:${n / mx * 60}%"></i><b>${n}</b></div>`).join('') || `<p>${t('none')}</p>`
+    };
+
+    /* craftsmen: grouped by phone (same person = one card) */
+    const rows = () => {
+      const q = $('#fq').value.toLowerCase(), base = D.filter(v => (v.fullName + v.email + v.phone + v.city).toLowerCase().includes(q));
+      $('#rs').innerHTML = segHtml(['', 'pending', 'accepted', 'rejected'].map(s => [s, s ? t('st_' + s) : t('all'), base.filter(v => !s || v.status === s).length]), rs);
+      bindSeg('rs', k => { rs = k; rows() });
+      const G = grp(base.filter(v => !rs || v.status === rs), v => pk(v.phone) || v.id);
+      $('#tr').innerHTML = G.map(g => {
+        const f = g[0], n = g.length;
+        return `<details class="fold grp"><summary><div class="av">${esc((f.fullName || '?')[0])}</div><div class="m"><b title="${esc(f.fullName)}">${esc(shortName(f.fullName))}</b><small>${n > 1 ? chip('same_craft', n, 'accounts') : `${ticon(f.trade)} ${esc(tn(f.trade))} · 📍 ${esc(f.city)}`}</small></div>${n === 1 ? bd(f.status) : ''}</summary><div class="in">${g.map(v => `<div class="rowi s-${sc(v.status)}"><div style="min-width:0"><b>${esc(v.email)}</b><small>📞 ${esc(v.phone)} · 📍 ${esc(v.city)} — ${esc(v.address)}<br>${ticon(v.trade)} ${esc(tn(v.trade))} · 📅 ${t('appts')}: ${v.jobs}/${v.requests}</small></div>${bd(v.status)}
+<div class="act"><button class="btn s ok" data-a="accepted" data-id="${v.id}">${t('accept')}</button><button class="btn s r" data-a="rejected" data-id="${v.id}">${t('reject')}</button><button class="btn s g" data-a="pending" data-id="${v.id}">${t('wait')}</button><button class="btn s t" data-a="edit" data-id="${v.id}">${t('edit')}</button><button class="btn s g" data-a="del" data-id="${v.id}">🗑️</button></div></div>`).join('')}</div></details>`
+      }).join('') || empty('🛠️')
+    };
+
+    /* requests vs appointments, grouped by customer or by craftsman */
+    const arows = () => {
+      const reqs = A.filter(a => a.status !== 'confirmed'), apts = A.filter(a => a.status === 'confirmed');
+      $('#as').innerHTML = segHtml([['req', '📨 ' + t('reqs'), reqs.length], ['apt', '📅 ' + t('appts'), apts.length]], as);
+      bindSeg('as', k => { as = k; arows() });
+      $('#ag').innerHTML = `<button data-k="cus" class="${ag === 'cus' ? 'on' : ''}">👤 ${t('by_cus')}</button><button data-k="cra" class="${ag === 'cra' ? 'on' : ''}">🛠️ ${t('by_cra')}</button>`;
+      bindSeg('ag', k => { ag = k; arows() });
+      const byC = ag === 'cus', G = grp(desc(as === 'req' ? reqs : apts, 'date'), a => byC ? (pk(a.phone) || a.customerId) : a.craftsmanId);
+      $('#ta').innerHTML = G.map(g => {
+        const f = g[0], n = g.length, nm = byC ? f.customerName : f.craftsmanName;
+        return `<details class="fold grp"><summary><div class="av">${esc((nm || '?')[0])}</div><div class="m"><b title="${esc(nm)}">${esc(shortName(nm))}</b><small>${n > 1 ? chip(byC ? 'same_cust' : 'same_craft', n) : `${byC ? '🛠️ ' + esc(shortName(f.craftsmanName)) : '👤 ' + esc(shortName(f.customerName))} · 📅 ${when(f)}`}</small></div>${n === 1 ? bd(f.status) : ''}</summary><div class="in">${g.map(a => `<div class="rowi s-${a.status}"><div style="min-width:0"><b>📅 ${when(a)}</b><small>${byC ? '🛠️ ' + esc(a.craftsmanName) : '👤 ' + esc(a.customerName)} · 📞 ${esc(a.phone)}<br>📍 ${esc(a.address)}${a.note ? ' · 📝 ' + esc(a.note) : ''}</small></div>${bd(a.status)}
+<div class="act"><button class="btn s ok" data-b="confirmed" data-id="${a.id}">${t('confirm')}</button><button class="btn s r" data-b="rejected" data-id="${a.id}">${t('reject')}</button><button class="btn s g" data-b="pending" data-id="${a.id}">${t('wait')}</button><button class="btn s g" data-b="del" data-id="${a.id}">🗑️</button></div></div>`).join('')}</div></details>`
+      }).join('') || empty(as === 'req' ? '📭' : '🗓️')
+    };
+
+    /* customers: same phone = same person */
+    const crows = () => {
+      const G = grp(CU, c => pk(c.phone) || c.email);
+      $('#tc').innerHTML = G.map(g => {
+        const f = g[0], n = g.length, rq = g.reduce((s, c) => s + c.requests, 0), cf = g.reduce((s, c) => s + c.confirmed, 0);
+        return `<details class="fold grp"><summary><div class="av">${esc((f.name || f.email || '?')[0].toUpperCase())}</div><div class="m"><b title="${esc(f.name || f.email)}">${esc(shortName(f.name) || f.email)}</b><small>${n > 1 ? chip('same_cust', n, 'accounts') + ' · ' : ''}📨 ${rq} · 📅 ${cf}</small></div></summary><div class="in">${g.map(c => `<div class="rowi s-${c.confirmed ? 'confirmed' : 'pending'}"><div style="min-width:0"><b>${esc(c.email)}</b><small>📞    ${esc(c.phone || '—')} · 📨 ${c.requests} · 📅 ${c.confirmed}<br>🕘 ${c.last ? new Date(c.last).toLocaleString(lang) : '—'}</small></div></div>`).join('')}</div></details>`
+      }).join('') || empty('👥')
+    };
+
+    document.addEventListener('click', async e => {
+      const b = e.target.closest('button'); if (!b || !b.dataset.id) return; const id = b.dataset.id, a = b.dataset.a, x = b.dataset.b;
+      try {
+        if (a === 'edit') { const v = D.find(v => v.id === id); eid = id;['fullName', 'phone', 'city', 'address'].forEach((k, i) => $('#e' + (i + 1)).value = v[k]); return $('#dl').showModal() }
+        if (a === 'del' || x === 'del') { if (!confirm(t('sure'))) return; await api(`/api/admin/${a ? 'craftsmen' : 'appointments'}/${id}`, { method: 'DELETE' }) }
+        else await api(`/api/admin/${a ? 'craftsmen' : 'appointments'}/${id}`, { method: 'PUT', body: { status: a || x } });
+        toast(t('saved')); refresh()
+      } catch (_) { }
+    });
+    $('#es').onclick = async () => { await api('/api/admin/craftsmen/' + eid, { method: 'PUT', body: { fullName: $('#e1').value, phone: $('#e2').value, city: $('#e3').value, address: $('#e4').value } }); $('#dl').close(); toast(t('saved')); refresh() };
+    $('#ec').onclick = () => $('#dl').close(); $('#fq').oninput = rows;
+    $('#tb').onclick = e => { const k = e.target.dataset.t; if (!k) return; document.querySelectorAll('#tb [data-t]').forEach(b => b.classList.toggle('on', b === e.target));['d', 'r', 'a', 'c'].forEach(i => $('#' + i).hidden = i !== k) };
+    $('#lo').onclick = () => { delete sessionStorage.adm; location.reload() };
+    $('#ex').onclick = async () => { const r = await fetch('/api/admin/export', { headers: { Authorization: 'Bearer ' + sessionStorage.adm } }); const u = URL.createObjectURL(await r.blob()), a = document.createElement('a'); a.href = u; a.download = 'craftsmen.csv'; a.click() };
+    $('#al').onclick = async () => { try { const r = await api('/api/admin/login', { method: 'POST', body: { email: $('#ae').value, password: $('#ap').value } }); sessionStorage.adm = r.token; start() } catch (e) { $('#am').textContent = t('bad') } };
+    window.onLang = () => { if (!$('#app').hidden) refresh() };
+    /* keep the activity feed fresh while the dashboard is open */
+    setInterval(() => { if (!$('#app').hidden && !$('#d').hidden && !$('#dl').open && !document.hidden) refresh() }, 30000);
+    if (sessionStorage.adm) start();
+  </script>
+</body>
+
+</html>

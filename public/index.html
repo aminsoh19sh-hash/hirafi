@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/style.css"><title>Hirafi</title>
+<style>
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:url("https://thumbs.dreamstime.com/b/pensive-businessman-looking-user-interface-against-modern-city-background-back-view-young-business-icons-chart-114935850.jpg") center/cover no-repeat;opacity:.16}
+[data-theme=dark] body::before{opacity:.1}
+.hero{background:color-mix(in srgb,var(--teal3) 82%,transparent)}
+.faq-tools{display:flex;gap:10px;margin:18px 0 22px}.faq-tools input{flex:1}
+details{transition:border-color .2s,box-shadow .2s}
+details[open]{border-color:var(--teal);box-shadow:var(--sh)}
+summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;background:color-mix(in srgb,var(--teal) 15%,transparent);color:var(--teal2);transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg);background:var(--sun);color:#1A1200}
+details[open] p{animation:fq .35s ease}
+@keyframes fq{from{opacity:0;transform:translateY(-6px)}}
+.faq-empty{text-align:center;color:var(--mut);display:none;padding:20px}
+</style></head><body data-title="home">
+<div id="splash"><div class="logo"><i>H</i>Hirafi</div></div>
+<div id="hd"></div>
+<section class="hero"><div class="wrap grid"><div>
+<h1 data-i="hero_t"></h1><p data-i="hero_p"></p>
+<div class="row"><a class="btn" href="/register.html" data-i="cta"></a><a class="btn g" href="/find.html" data-i="find_cta"></a></div></div>
+<svg class="map" viewBox="0 0 500 360" aria-hidden="true">
+<style>
+.hf-road{fill:none;stroke:#2B4660;stroke-width:14;stroke-linecap:butt}
+.hf-line{fill:none;stroke:#FFB02E;stroke-width:2.5;stroke-dasharray:7 9;animation:hfd 1.6s linear infinite;opacity:.9}
+@keyframes hfd{to{stroke-dashoffset:-32}}
+.hf-ring{fill:none;stroke:var(--teal);stroke-width:3;transform-box:fill-box;transform-origin:center;animation:hfp 2.4s ease-out infinite}
+.hf-ring.d{animation-delay:1.2s}.hf-ring.w{stroke:#FFB02E}
+@keyframes hfp{from{transform:scale(.5);opacity:.9}to{transform:scale(3);opacity:0}}
+.hf-spin{fill:none;stroke:var(--teal);stroke-width:1.6;stroke-dasharray:4 6;transform-box:fill-box;transform-origin:center;animation:hfs 14s linear infinite}
+@keyframes hfs{to{transform:rotate(360deg)}}
+.hf-w{animation:hfb 2.2s ease-in-out infinite alternate}
+@keyframes hfb{to{transform:translateY(-3px)}}
+.hf-lamp{animation:hfl 3s ease-in-out infinite alternate}
+@keyframes hfl{from{opacity:.15}to{opacity:.45}}
+.hf-r,.hf-c{offset-rotate:0deg;animation-iteration-count:infinite}
+.hf-r{animation-name:hfg;animation-timing-function:ease-in-out}
+@keyframes hfg{0%{offset-distance:0;opacity:0}8%{opacity:1}90%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.hf-c{animation-name:hfc;animation-timing-function:linear;animation-duration:9s}
+@keyframes hfc{0%{offset-distance:0;opacity:0}6%{opacity:1}94%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.q1{offset-path:path("M86 180 H194 Q210 180 210 164 V112");animation-duration:4s;animation-delay:-1s}
+.q2{offset-path:path("M86 180 H194 Q210 180 210 196 V248");animation-duration:4s;animation-delay:-3s}
+.q3{offset-path:path("M86 180 H334 Q350 180 350 164 V112");animation-duration:6s;animation-delay:-2s}
+.q4{offset-path:path("M86 180 H334 Q350 180 350 196 V248");animation-duration:6s;animation-delay:-5s}
+.q5{offset-path:path("M86 180 H418");animation-duration:6.5s;animation-delay:-0.5s}
+.q6{offset-path:path("M86 180 H418");animation-duration:6.5s;animation-delay:-3.7s}
+.q7{offset-path:path("M86 180 H194 Q210 180 210 164 V112");animation-duration:4s;animation-delay:-2.2s}
+.c1{offset-path:path("M90 176 H418")}.c2{offset-path:path("M418 184 H90");animation-delay:-4s}
+@media(prefers-reduced-motion:reduce){.hf-r,.hf-c{offset-distance:50%;opacity:1}}
+</style>
+<defs>
+<linearGradient id="hf-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b8fe0"/><stop offset="1" stop-color="#0b3a7a"/></linearGradient>
+<pattern id="hf-win" width="12" height="14" patternUnits="userSpaceOnUse"><rect x="3" y="3" width="6" height="7" rx="1" fill="#bfeeff" opacity=".85"/></pattern>
+<g id="hf-t1"><rect width="44" height="96" fill="url(#hf-bg)"/><rect width="44" height="96" fill="url(#hf-win)"/><rect x="8" y="16" width="6" height="7" fill="#FFB02E"/><rect x="26" y="52" width="6" height="7" fill="#FFB02E"/><rect x="20" y="-12" width="3" height="12" fill="#2B4660"/><circle cx="21.5" cy="-13" r="2.5" fill="#E5484D"/></g>
+<g id="hf-t2"><rect width="34" height="64" fill="#E5484D"/><rect width="34" height="64" fill="url(#hf-win)"/><rect width="34" height="4" fill="#fff" opacity=".25"/></g>
+<g id="hf-t3"><rect width="40" height="70" fill="#2f86d6"/><rect width="40" height="70" fill="url(#hf-win)"/><rect x="12" y="20" width="6" height="7" fill="#FFB02E"/><rect width="40" height="4" fill="#fff" opacity=".25"/></g>
+<g id="hf-house"><rect y="10" width="28" height="20" rx="2" fill="#E8EEF2"/><polygon points="-3,11 14,-3 31,11" fill="#E5484D"/><rect x="11" y="18" width="7" height="12" fill="#0E9F92"/><rect x="3" y="15" width="5" height="5" fill="#FFB02E"/><rect x="21" y="15" width="5" height="5" fill="#FFB02E"/></g>
+<g id="hf-tree"><rect x="-1.5" y="4" width="3" height="7" fill="#7a5230"/><circle r="8" fill="#1FA463"/><circle cx="-3" cy="-2" r="3" fill="#35c47b" opacity=".7"/></g>
+</defs>
+<g fill="#12293F"><rect x="20" y="20" width="100" height="90" rx="14"/><rect x="20" y="250" width="100" height="90" rx="14"/><rect x="150" y="20" width="120" height="90" rx="14"/><rect x="290" y="20" width="120" height="90" rx="14"/><rect x="150" y="250" width="120" height="90" rx="14"/><rect x="290" y="250" width="120" height="90" rx="14"/><rect x="430" y="20" width="60" height="90" rx="14"/><rect x="430" y="250" width="60" height="90" rx="14"/></g>
+<use href="#hf-t1" x="30" y="14"/><use href="#hf-t3" x="76" y="40"/><text x="108" y="38" font-size="18" text-anchor="middle">🌙</text>
+<use href="#hf-t2" x="30" y="270"/><use href="#hf-t3" x="70" y="264"/>
+<use href="#hf-t2" x="158" y="38"/><use href="#hf-house" x="234" y="70"/>
+<use href="#hf-t2" x="298" y="38"/><use href="#hf-house" x="374" y="70"/>
+<use href="#hf-t2" x="158" y="268"/><use href="#hf-house" x="234" y="285"/>
+<use href="#hf-t2" x="298" y="268"/><use href="#hf-house" x="374" y="285"/>
+<use href="#hf-house" x="446" y="52"/><use href="#hf-t3" x="440" y="264"/>
+<use href="#hf-tree" x="134" y="146"/><use href="#hf-tree" x="134" y="216"/><use href="#hf-tree" x="280" y="136"/><use href="#hf-tree" x="280" y="228"/><use href="#hf-tree" x="425" y="130"/><use href="#hf-tree" x="480" y="135"/><use href="#hf-tree" x="425" y="232"/><use href="#hf-tree" x="480" y="228"/>
+<g class="hf-road"><path d="M86 180 H418"/><path d="M210 180 V112"/><path d="M210 180 V248"/><path d="M350 180 V112"/><path d="M350 180 V248"/></g>
+<g class="hf-line"><path d="M86 180 H418"/><path d="M210 180 V112"/><path d="M210 180 V248"/><path d="M350 180 V112"/><path d="M350 180 V248"/></g>
+<g fill="#0E9F92"><circle cx="210" cy="112" r="4"/><circle cx="210" cy="248" r="4"/><circle cx="350" cy="112" r="4"/><circle cx="350" cy="248" r="4"/></g>
+<g fill="#FFB02E"><circle class="hf-lamp" cx="150" cy="166" r="9"/><circle cx="150" cy="166" r="2.5"/><circle class="hf-lamp" cx="280" cy="194" r="9"/><circle cx="280" cy="194" r="2.5"/><circle class="hf-lamp" cx="395" cy="166" r="9"/><circle cx="395" cy="166" r="2.5"/></g>
+<g font-size="26" text-anchor="middle"><text class="hf-w" x="210" y="100">👷‍♂️</text><text class="hf-w" style="animation-delay:-.7s" x="350" y="100">👷‍♀️</text><text class="hf-w" style="animation-delay:-1.4s" x="210" y="290">🧑‍🔧</text><text class="hf-w" style="animation-delay:-.4s" x="350" y="290">👨‍🔧</text></g>
+<circle class="hf-spin" cx="440" cy="180" r="36"/>
+<circle class="hf-ring" cx="440" cy="180" r="20"/><circle class="hf-ring d" cx="440" cy="180" r="20"/>
+<circle cx="440" cy="180" r="22" fill="var(--teal)"/><text x="440" y="189" text-anchor="middle" font-size="24">🛠️</text>
+<circle cx="460" cy="158" r="11" fill="#FFB02E"/><text x="460" y="163" text-anchor="middle" font-size="13">⭐</text>
+<circle class="hf-ring w" cx="50" cy="180" r="26"/><circle class="hf-ring w d" cx="50" cy="180" r="26"/>
+<rect x="24" y="130" width="52" height="100" rx="12" fill="#0B1B2B" stroke="#2B4660" stroke-width="3"/>
+<rect x="30" y="142" width="40" height="76" rx="7" fill="#12293F"/>
+<text x="50" y="172" text-anchor="middle" font-size="22">🔍</text>
+<rect x="35" y="184" width="30" height="6" rx="3" fill="var(--teal)"/><rect x="35" y="195" width="30" height="6" rx="3" fill="#FFB02E" opacity=".8"/><rect x="35" y="206" width="30" height="6" rx="3" fill="#2B4660"/>
+<circle cx="50" cy="224" r="2.5" fill="#2B4660"/>
+<g class="hf-c c1"><rect x="-7" y="-3.5" width="14" height="7" rx="3" fill="#EAF2F1"/></g>
+<g class="hf-c c2"><rect x="-7" y="-3.5" width="14" height="7" rx="3" fill="#E5484D"/></g>
+<g class="hf-r q1"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📋</text></g>
+<g class="hf-r q2"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📋</text></g>
+<g class="hf-r q3"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📋</text></g>
+<g class="hf-r q4"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📋</text></g>
+<g class="hf-r q5"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📞</text></g>
+<g class="hf-r q6"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📋</text></g>
+<g class="hf-r q7"><circle r="12" fill="#FFB02E"/><text y="5" text-anchor="middle" font-size="13">📞</text></g>
+</svg></div></section>
+<section class="s" id="about"><div class="wrap"><h2 data-i="about_t"></h2><p class="lead" data-i="about_p"></p>
+<div class="cards"><div class="card"><div class="ic">⚡</div><h3 data-i="s1"></h3><p data-i="s1d"></p></div><div class="card"><div class="ic">🛡️</div><h3 data-i="s2"></h3><p data-i="s2d"></p></div><div class="card"><div class="ic">📅</div><h3 data-i="s3"></h3><p data-i="s3d"></p></div></div></div></section>
+<section class="s"><div class="wrap"><div class="band"><div><h2 data-i="cta"></h2><p data-i="a1"></p></div><a class="btn" href="/register.html" data-i="reg"></a></div></div></section>
+
+<section class="s" id="faq"><div class="wrap" style="max-width:780px"><h2 data-i="faq_t"></h2>
+<div class="faq-tools"><input id="faqQ" type="search" placeholder="🔎 ابحث في الأسئلة الشائعة..."></div>
+<details><summary data-i="q1"></summary><p data-i="a1"></p></details>
+<details><summary data-i="q2"></summary><p data-i="a2"></p></details>
+<details><summary data-i="q3"></summary><p data-i="a3"></p></details>
+<details><summary data-i="q4"></summary><p data-i="a4"></p></details>
+<details><summary data-i="q5"></summary><p data-i="a5"></p></details>
+<details><summary data-i="q6"></summary><p data-h="a6"></p></details>
+<details><summary data-i="q7"></summary><p data-i="a7"></p></details>
+<details><summary data-i="q8"></summary><p data-i="a8"></p></details>
+<details><summary data-i="q9"></summary><p data-i="a9"></p></details>
+<details><summary data-i="q10"></summary><p data-i="a10"></p></details>
+<details><summary data-i="q11"></summary><p data-h="a11"></p></details>
+<details><summary data-i="q12"></summary><p data-i="a12"></p></details>
+<details><summary data-i="q13"></summary><p data-i="a13"></p></details>
+<details><summary data-i="q14"></summary><p data-i="a14"></p></details>
+<p class="faq-empty" id="faqNo">لا توجد نتائج مطابقة 🤔 جرّب كلمات أخرى.</p>
+</div></section>
+
+<div id="ft"></div>
+<script src="/js/app.js"></script>
+<script>const s=document.getElementById('splash');if(sessionStorage.sp){s.remove()}else{sessionStorage.sp=1;setTimeout(()=>s.classList.add('hide'),1500)}</script>
+<script>
+(()=>{
+const ds=[...document.querySelectorAll('#faq details')],no=document.getElementById('faqNo');
+document.getElementById('faqQ').addEventListener('input',e=>{const v=e.target.value.trim().toLowerCase();let n=0;ds.forEach(d=>{const m=d.textContent.toLowerCase().includes(v);d.style.display=m?'':'none';if(m)n++});no.style.display=n?'none':'block'});
+ds.forEach(d=>d.addEventListener('toggle',()=>{if(d.open)ds.forEach(o=>{if(o!==d)o.open=false})}));
+})();
+</script>
+</body></html>

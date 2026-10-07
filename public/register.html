@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0E9F92">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <title>Hirafi</title>
+</head>
+
+<body data-title="reg">
+  <div id="hd"></div>
+  <main class="wrap" id="v"></main>
+  <dialog id="dl">
+    <h3 data-i="edit"></h3><label data-i="name"></label><input id="e1"><label data-i="phone"></label><input
+      id="e2"><label data-i="city"></label><select class="f" id="e3"></select><input id="e3c"
+      style="display:none;margin-top:8px"><label data-i="addr"></label><input id="e4"><label
+      data-i="trade"></label><select class="f" id="e5"></select><input id="e5c" style="display:none;margin-top:8px">
+    <div class="msg" id="em"></div>
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn t" id="es" data-i="save"
+        style="flex:1"></button><button class="btn g" id="ec" data-i="cancel"></button></div>
+  </dialog>
+  <div id="ft"></div>
+  <script src="/js/app.js"></script>
+  <script>
+    const D = (u, m, b) => api(u, { method: m, body: b, tk: 'drv' }), v = id => document.getElementById(id).value.trim();
+    let me = null, fresh = false, R = [], pc = null, view = 'auto';
+    Object.assign(T.ar, { reqs: 'الطلبات', same_craft: 'نفس الحرفي', same_cust: 'نفس الزبون', upcoming: 'القادمة', past: 'السابقة' });
+    Object.assign(T.fr, { reqs: 'Demandes', same_craft: 'Même artisan', same_cust: 'Même client', upcoming: 'À venir', past: 'Passés' });
+    Object.assign(T.en, { reqs: 'Requests', same_craft: 'Same craftsman', same_cust: 'Same customer', upcoming: 'Upcoming', past: 'Past' });
+    let ot = 'up';
+    const pk = p => String(p || '').replace(/\D/g, '');
+    const grp = (arr, key) => { const m = new Map(); arr.forEach(a => { const k = key(a); m.has(k) ? m.get(k).push(a) : m.set(k, [a]) }); return [...m.values()] };
+    const itemC = a => { const [d, tm] = dt(a.date); return `<div class="rowi s-confirmed"><div style="min-width:0"><b>📅 ${esc(d)} · 🕒 ${esc(tm)}</b><small>📍 ${esc(a.address)}${a.note ? ' · 📝 ' + esc(a.note) : ''}</small></div></div>` };
+    const gcardC = g => { const f = g[0], n = g.length, [d, tm] = dt(f.date); return `<details class="fold grp"><summary><div class="av">${esc((f.customerName || '?')[0])}</div><div class="m"><b title="${esc(f.customerName)}">${esc(shortName(f.customerName))}</b><small>${n > 1 ? `<span class="chip">🔁 ${t('same_cust')} · ${n}</span>` : `📅 ${esc(d)} · 🕒 ${esc(tm)}`}</small></div></summary><div class="in">${g.map(itemC).join('')}<a class="btn ok s" style="width:100%;margin-top:10px" href="tel:${esc(f.phone)}">📞 ${t('call_him')} · ${esc(f.phone)}</a></div></details>` };
+    const reqCard = r => { const [d, tm] = dt(r.date); return `<div class="card req"><b>🔔 ${t('new_req')}</b><div class="rg"><span>👤 ${t('customer')}: <b title="${esc(r.customerName)}">${esc(shortName(r.customerName))}</b></span><span>📞 <a href="tel:${esc(r.phone)}"><b>${esc(r.phone)}</b></a></span><span>📍 ${esc(r.address)}</span><span>📅 ${esc(d)} · 🕒 ${esc(tm)}</span>${r.note ? `<span>📝 ${esc(r.note)}</span>` : ''}</div><a class="btn ok s" href="tel:${esc(r.phone)}">📞 ${t('call_him')}</a></div>` };
+    const IC = { pending: '⏳', accepted: '✅', rejected: '⛔' };
+    const logout = () => { delete sessionStorage.drv; fresh = false; pc = null; view = 'auto'; render() };
+
+    async function render() {
+      const el = $('#v');
+      if (!sessionStorage.drv) return authView(el, 'drv', '/api/craftsman', n => { fresh = false; render() }, t('reg'));
+      try { me = await D('/api/craftsman/me') } catch (e) { delete sessionStorage.drv; return render() }
+      R = me.status === 'incomplete' ? [] : await D('/api/craftsman/requests'); if (pc !== null && R.length > pc) toast('🔔 ' + t('new_req')); pc = R.length;
+
+      if (me.status === 'incomplete') {
+        el.innerHTML = `<div class="panel" style="max-width:640px"><div class="menu"><button id="lo" class="logout">${t('logout')}</button></div><h2>${t('reg')}</h2>
+    <details class="fold"><summary>📄 ${t('terms_t')}</summary><div class="in terms" style="max-height:none;margin:0">${t('terms_d')}</div></details>
+    <label>${t('name')}</label><input id="fn" autocomplete="name"><label>${t('phone')}</label><input id="ph" type="tel">
+    <label>${t('city')}</label><select class="f" id="ct"></select><input id="ctc" style="display:none;margin-top:8px">
+    <label>${t('addr')}</label><input id="ad">
+    <label>${t('trade')}</label><select class="f" id="vh"></select><input id="vhc" style="display:none;margin-top:8px">
+    <label class="chk" style="margin-top:16px"><input type="checkbox" id="ag">${t('agree')}</label><div class="msg" id="m2"></div><button class="btn t" id="sd" style="width:100%">${t('send')}</button></div>`;
+        $('#ct').innerHTML = cityOpts('');
+        $('#vh').innerHTML = tradeOpts('');
+        $('#ctc').placeholder = t('custom_city');
+        $('#vhc').placeholder = t('custom_trade');
+        bindCustom($('#ct'), $('#ctc'));
+        bindCustom($('#vh'), $('#vhc'));
+        $('#sd').onclick = async () => {
+          if (!$('#ag').checked) return $('#m2').textContent = t('mustagree');
+          const city = finalVal($('#ct'), $('#ctc'));
+          const trade = finalVal($('#vh'), $('#vhc'));
+          if (!city || !trade) return $('#m2').textContent = t('err');
+          try { await D('/api/craftsman/me', 'PUT', { fullName: v('fn'), phone: v('ph'), city: city, address: v('ad'), trade: trade }); fresh = true; view = 'orders'; render() } catch (e) { $('#m2').textContent = t('err') }
+        };
+        $('#lo').onclick = logout;
+        return;
+      }
+      if (view === 'auto') view = 'orders';
+      const lo = `<div class="menu">
+    <button data-v="orders" class="${view === 'orders' ? 'on' : ''}">📋 ${t('appts')}</button>
+    <button data-v="profile" class="${view === 'profile' ? 'on' : ''}">👤 ${t('myinfo')}</button>
+    <button id="lo" class="logout">${t('logout')}</button>
+  </div>`;
+
+      if (view === 'orders') {
+        const now = Date.now(), isUp = a => new Date(a.date) >= now, up = R.filter(isUp), past = R.filter(a => !isUp(a));
+        const cu = new Set(R.map(a => pk(a.phone))).size;
+        const groups = grp((ot === 'up' ? up : past).slice().sort((a, b) => ot === 'up' ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)), a => pk(a.phone));
+        el.innerHTML = `<div style="max-width:900px;margin:auto;padding:16px 0">${lo}
+    ${fresh ? `<div class="card thanks"><div class="big">🎉</div><h2>${t('thanks_t')}</h2><p>${t('thanks_d')}</p></div>` : ''}
+    <div class="kpis"><div class="kpi"><div class="ic">📅</div><b>${R.length}</b><span>${t('appts')}</span></div><div class="kpi sun"><div class="ic">👥</div><b>${cu}</b><span>${t('customers')}</span></div><div class="kpi ink"><div class="ic">⏳</div><b>${up.length}</b><span>${t('upcoming')}</span></div></div>
+    <div class="card sc"><div class="big">${IC[me.status]}</div><div><b>${t('your_status')}</b> <span class="badge b-${me.status}">${t('st_' + me.status)}</span><br><span>${t('msg_' + me.status)}</span></div></div>
+    <div class="seg"><button data-o="up" class="${ot === 'up' ? 'on' : ''}">⏳ ${t('upcoming')}<i>${up.length}</i></button><button data-o="past" class="${ot === 'past' ? 'on' : ''}">🗂️ ${t('past')}<i>${past.length}</i></button></div>
+    ${groups.map(gcardC).join('') || `<div class="empty"><div class="big">🗓️</div>${t('none')}</div>`}</div>`;
+        el.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { ot = b.dataset.o; fresh = false; render() });
+      }
+      else if (view === 'profile') {
+        el.innerHTML = `<div style="max-width:900px;margin:auto;padding:16px 0">${lo}
+    <div class="profile-card"><div class="profile-head"><div class="av">${esc((me.fullName || me.email || 'H')[0])}</div><div style="min-width:0"><h3 title="${esc(me.fullName || '')}">${esc(shortName(me.fullName) || '—')}</h3><small>${TIC[me.trade] ? ticon(me.trade) : '🛠️'} ${esc(TIC[me.trade] ? tname(me.trade) : (me.trade || '—'))}</small> <span class="badge b-${me.status}">${t('st_' + me.status)}</span></div></div>
+    <div class="tiles"><div><b>${R.length}</b>${t('requests')}</div><div><b>${R.length}</b>${t('jobs')}</div><div><b>${IC[me.status]}</b>${t('status')}</div></div>
+    <details class="fold" style="box-shadow:none;margin-top:14px"><summary>ℹ️ ${t('myinfo')}</summary><div class="in profile-info">
+      <div><b>${t('email')}:</b> ${esc(me.email)}</div>
+      <div><b>${t('phone')}:</b> ${esc(me.phone || '—')}</div>
+      <div><b>${t('city')}:</b> ${esc(me.city || '—')}</div>
+      <div><b>${t('addr')}:</b> ${esc(me.address || '—')}</div>
+    </div></details>
+    <div class="profile-actions"><button class="btn t" id="ed" style="flex:1">${t('edit')}</button><button class="btn r" id="dx">${t('del')}</button></div>
+    <details class="fold" style="box-shadow:none;margin-top:14px"><summary>🔒 GDPR</summary><div class="in" style="color:var(--mut);font-size:.88rem">${t('gdpr_note')}</div></details></div></div>`;
+        $('#ed').onclick = () => {
+          $('#e3').innerHTML = cityOpts(me.city || '');
+          $('#e5').innerHTML = tradeOpts(me.trade || '');
+          $('#e3c').placeholder = t('custom_city');
+          $('#e5c').placeholder = t('custom_trade');
+          $('#e3c').value = (me.city && !CITIES.includes(me.city)) ? me.city : '';
+          $('#e5c').value = (me.trade && !TRADES.includes(me.trade)) ? me.trade : '';
+          bindCustom($('#e3'), $('#e3c'));
+          bindCustom($('#e5'), $('#e5c'));
+          $('#e1').value = me.fullName || '';
+          $('#e2').value = me.phone || '';
+          $('#e4').value = me.address || '';
+          $('#em').textContent = '';
+          $('#dl').showModal();
+        };
+        $('#dx').onclick = async () => { if (!confirm(t('sure'))) return; await D('/api/craftsman/me', 'DELETE'); logout() };
+      }
+      $('#lo').onclick = logout;
+      el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view = b.dataset.v; fresh = false; render() });
+    }
+    $('#ec').onclick = () => $('#dl').close();
+    $('#es').onclick = async () => {
+      const city = finalVal($('#e3'), $('#e3c'));
+      const trade = finalVal($('#e5'), $('#e5c'));
+      if (!city || !trade) return $('#em').textContent = t('err');
+      try {
+        await D('/api/craftsman/me', 'PUT', { fullName: $('#e1').value, phone: $('#e2').value, city: city, address: $('#e4').value, trade: trade });
+        $('#dl').close(); fresh = false; toast(t('saved')); render();
+      } catch (e) { $('#em').textContent = t('err') }
+    };
+    window.onLang = render;
+    setInterval(() => { if (me && sessionStorage.drv && me.status !== 'incomplete' && !$('#dl').open && !document.hidden && !$('#v details[open]')) render() }, 20000);
+  </script>
+</body>
+
+</html>
