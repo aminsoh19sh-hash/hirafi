@@ -1,0 +1,15 @@
+/* One-time import of data/db.json into MongoDB:  npm run migrate */
+require('dotenv').config();
+const fs = require('fs'), path = require('path');
+const { save, ping } = require('../src/db');
+
+(async () => {
+    const f = path.join(__dirname, '../data/db.json');
+    if (!fs.existsSync(f)) { console.log('No data/db.json found — nothing to import.'); process.exit(0); }
+    const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+    ['craftsmen', 'customers', 'appointments', 'events'].forEach(k => d[k] = d[k] || []);
+    await ping();
+    await save(d);
+    console.log(`Imported: ${d.craftsmen.length} craftsmen, ${d.customers.length} customers, ${d.appointments.length} appointments, ${d.events.length} events`);
+    process.exit(0);
+})().catch(e => { console.error('Migration failed:', e.message); process.exit(1); });
