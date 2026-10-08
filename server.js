@@ -1,9 +1,14 @@
 require('dotenv').config();
 const express = require('express'), crypto = require('crypto'), os = require('os');
-const { load, save, id, log } = require('./src/db');
+const { load, save, id, log, init } = require('./src/db');
 const app = express();
 app.use(express.json({ limit: '50kb' }));
-app.use(express.static('public'));
+
+/* ---------- Initialise MongoDB before handling any request ---------- */
+app.use(async (q, r, n) => {
+  try { await init(); n(); }
+  catch (e) { console.error('DB init failed:', e.message); r.status(500).json({ error: 'db' }); }
+});
 
 /* ---------- Security helpers ---------- */
 const SECRET = process.env.SECRET || 'dev';
@@ -236,22 +241,25 @@ app.use((err, q, r, n) => {
   r.status(500).json({ error: 'server' });
 });
 
-/* ---------- Server ---------- */
+/* ---------- Server (local only; Vercel uses the export below) ---------- */
 const P = Number(process.env.PORT) || 3000;
-const HOST = '0.0.0.0'; /* listen on all network interfaces so phones on the same Wi-Fi can connect */
+const HOST = '0.0.0.0';
 
-/* Real LAN addresses of this machine (no hard-coded IP) */
 const lanIPs = () => Object.values(os.networkInterfaces()).flat()
   .filter(i => i && (i.family === 'IPv4' || i.family === 4) && !i.internal)
   .map(i => i.address);
 
-const server = app.listen(P, HOST, () => {
-  console.log(`Hirafi running → http://localhost:${P}`);
-  lanIPs().forEach(ip => console.log(`Hirafi running → http://${ip}:${P}   (same Wi-Fi devices)`));
-  console.log('If the LAN address does not open: allow TCP port ' + P + ' in Windows Firewall (see README / chat).');
-});
-server.on('error', e => {
-  if (e.code === 'EADDRINUSE') console.error(`✖ Port ${P} is already in use. Close the other server or set PORT in .env.`);
-  else console.error('✖ Server error:', e.message);
-  process.exit(1);
-});
+if (require.main === module) {
+  const server = app.listen(P, HOST, () => {
+    console.log(`Hirafi running → http://localhost:${P}`);
+    lanIPs().forEach(ip => console.log(`Hirafi running → http://${ip}:${P}   (same Wi-Fi devices)`));
+  });
+  server.on('error', e => {
+    if (e.code === 'EADDRINUSE') console.error(`✖ Port ${P} is already in use. Close the other server or set PORT in .env.`);
+    else console.error('✖ Server error:', e.message);
+    process.exit(1);
+  });
+}
+
+/* ---------- Export for Vercel (Serverless) ---------- */
+module.exports = app;
