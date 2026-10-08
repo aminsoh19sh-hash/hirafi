@@ -255,6 +255,3 @@ server.on('error', e => {
   else console.error('✖ Server error:', e.message);
   process.exit(1);
 });
-
-/* ---------- Export for Vercel (Serverless) ---------- */
-module.exports = app;
