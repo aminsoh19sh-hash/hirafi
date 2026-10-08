@@ -2985,6 +2985,13 @@
   ],
   "customers": [
     {
+      "id": "muzq7gv08s1o",
+      "email": "wxwxwxaaaa@gmail.com",
+      "pass": "05c26aa0a6f3ea86:d97f37f91c9b5cac066915a62d5ba7745736ebb650d474c803b6154f3ef1fa99",
+      "fullName": "wxwxwxaaaa@gmail.com",
+      "createdAt": "2026-10-08T16:03:34.860Z"
+    },
+    {
       "id": "muygv3w9r18k",
       "email": "aaau@gmail.com",
       "pass": "26b2d6951d2293a6:05c9fcb480fb62f1c6d11c29fc39a01b17f0e0bc0f4acd07b22a49b636bf35ca",
@@ -3107,6 +3114,12 @@
     }
   ],
   "events": [
+    {
+      "id": "muzq7gwcoc29",
+      "type": "cus_signup",
+      "text": "wxwxwxaaaa@gmail.com · wxwxwxaaaa@gmail.com",
+      "at": "2026-10-08T16:03:34.860Z"
+    },
     {
       "id": "muygv4ki8iwt",
       "type": "cus_signup",
