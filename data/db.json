@@ -2985,6 +2985,13 @@
   ],
   "customers": [
     {
+      "id": "muygv3w9r18k",
+      "email": "aaau@gmail.com",
+      "pass": "26b2d6951d2293a6:05c9fcb480fb62f1c6d11c29fc39a01b17f0e0bc0f4acd07b22a49b636bf35ca",
+      "fullName": "aaau",
+      "createdAt": "2026-10-07T18:54:15.778Z"
+    },
+    {
       "id": "mux8fdceg0fc",
       "email": "bbbggbbbbb@gmail.com",
       "pass": "c7fc2ceeea21e761:9c57e16148c383450a718263f4ca09dd067528bcc15d1783e3867049669e74eb",
@@ -3100,6 +3107,12 @@
     }
   ],
   "events": [
+    {
+      "id": "muygv4ki8iwt",
+      "type": "cus_signup",
+      "text": "aaau · aaau@gmail.com",
+      "at": "2026-10-07T18:54:16.290Z"
+    },
     {
       "id": "mux8i6x7kiyh",
       "type": "accepted",
